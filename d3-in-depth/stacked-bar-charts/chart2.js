@@ -20,7 +20,7 @@ const chart2 = () => {
             .scaleLinear()
             .domain([0, 1])
             .range([HEIGHT - 20, 0])
-        svg.append("g")
+        svg.append('g')
             .attr('transform', `translate(20, 0)`)
             .call(d3.axisLeft(yScale));
 
@@ -29,7 +29,7 @@ const chart2 = () => {
             .domain(subgroups)
             .range(d3.schemeTableau10)
 
-            const stackedData = d3
+        const stackedData = d3
             .stack()
             .offset(d3.stackOffsetExpand)
             .keys(subgroups)

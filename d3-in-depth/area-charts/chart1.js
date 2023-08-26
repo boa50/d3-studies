@@ -24,7 +24,7 @@ const chart1 = () => {
             .scaleLinear()
             .domain([0, d3.max(data, d => d.value)])
             .range([HEIGHT - 20, 0])
-        svg.append("g")
+        svg.append('g')
             .attr('transform', `translate(40, 0)`)
             .call(d3.axisLeft(yScale));
 
