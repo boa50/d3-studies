@@ -1,19 +1,19 @@
-const chart2 = () => {
+const chart3 = () => {
     const getData = async () =>
-        await d3.csv('./dataset2.csv')
+        await d3.csv('./dataset3.csv')
 
-    const svg = getSvg(2, 'Stacked from long input')
+    const svg = getSvg(3, 'Stacked from wide input')
 
     getData().then(data => {
-        const sumstat = d3.group(data, d => d.year)
-        const groups = [... new Set(d3.map(data, d => d.name))]
-        const keys = [...Array(groups.length + 1).keys()].slice(1)
+        const groups = data.columns.slice(1)
 
         const stackedData = d3
             .stack()
-            .keys(keys)
-            .value((d, key) => d[1][key] !== undefined ? d[1][key].n : 0)
-            (sumstat)
+            .keys(groups)
+            .order(d3.stackOrderDescending)
+            (data)
+
+        console.log(stackedData);
 
         const xScale = d3
             .scaleLinear()
@@ -25,7 +25,7 @@ const chart2 = () => {
 
         const yScale = d3
             .scaleLinear()
-            .domain([0, d3.max(data, d => +d.n) * 1.5])
+            .domain([0, 200000])
             .range([HEIGHT - 20, 0])
         svg.append('g')
             .attr('transform', `translate(50, 0)`)
@@ -38,7 +38,7 @@ const chart2 = () => {
 
         const areaGenerator = d3
             .area()
-            .x(d => xScale(d.data[0]))
+            .x(d => xScale(d.data.year))
             .y0(d => yScale(d[0]))
             .y1(d => yScale(d[1]))
 
@@ -46,9 +46,9 @@ const chart2 = () => {
             .selectAll('mylayers')
             .data(stackedData)
             .join('path')
-            .style('fill', d => colours(groups[d.key - 1]))
+            .style('fill', d => colours(d.key))
             .attr('d', areaGenerator)
     })
 }
 
-chart2()
+chart3()
