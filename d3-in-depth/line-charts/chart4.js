@@ -45,6 +45,8 @@ const chart4 = () => {
             .data(groupedData)
             .enter()
             .append('path')
+            .style('fill', 'none')
+            .attr('stroke-width', 2)
             .attr('stroke', d => colours(d.key))
             .attr('d', d => lineGenerator(d.values))
     })

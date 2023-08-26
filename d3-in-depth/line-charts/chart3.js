@@ -30,6 +30,8 @@ const chart3 = () => {
         svg
             .append('path')
             .datum(data)
+            .style('fill', 'none')
+            .attr('stroke-width', 2)
             .attr('stroke', 'steelblue')
             .attr('d', lineGenerator)
     })
