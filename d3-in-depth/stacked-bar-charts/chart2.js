@@ -18,7 +18,7 @@ const chart2 = () => {
 
         yScale = d3
             .scaleLinear()
-            .domain([0, 100])
+            .domain([0, 1])
             .range([HEIGHT - 20, 0])
         svg.append("g")
             .attr('transform', `translate(20, 0)`)
@@ -29,27 +29,11 @@ const chart2 = () => {
             .domain(subgroups)
             .range(d3.schemeTableau10)
 
-        // Normalizing the data
-        const dataNormalized = data.map(d => {
-            let total = 0
-
-            for (i in subgroups) {
-                let subgroup = subgroups[i]
-                total += +d[subgroup]
-            }
-
-            for (i in subgroups) {
-                let subgroup = subgroups[i]
-                d[subgroup] = (+d[subgroup] / total) * 100
-            }
-
-            return d
-        })
-
-        const stackedData = d3
+            const stackedData = d3
             .stack()
+            .offset(d3.stackOffsetExpand)
             .keys(subgroups)
-            (dataNormalized)
+            (data)
 
         svg
             .selectAll('.group')
