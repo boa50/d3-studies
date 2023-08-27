@@ -1,6 +1,6 @@
-const chart1 = () => {
+const chart2 = () => {
     const data = { a: 9, b: 20, c: 30, d: 8, e: 12 }
-    const svg = getSvg(1, 'Basic pie chart')
+    const svg = getSvg(2, 'Basic donut chart')
 
     const radius = Math.min(WIDTH, HEIGHT) / 2
 
@@ -15,8 +15,10 @@ const chart1 = () => {
 
     const arcGenerator = d3
         .arc()
-        .innerRadius(0)
+        .innerRadius(70)
         .outerRadius(radius)
+        .padAngle(.02)
+        .cornerRadius(2)
 
     svg
         .append('g')
@@ -26,9 +28,7 @@ const chart1 = () => {
         .join('path')
         .attr('d', arcGenerator)
         .attr('fill', d => colours(d.data[1]))
-        .attr('stroke', '#cccccc')
-        .style('stroke-width', '2px')
         .style('opacity', 0.7)
 }
 
-chart1()
+chart2()
