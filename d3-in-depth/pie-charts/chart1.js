@@ -1,6 +1,8 @@
 const chart1 = () => {
     const data = { a: 9, b: 20, c: 30, d: 8, e: 12 }
     const svg = getSvg(1, 'Basic pie chart')
+        .append('g')
+        .attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`)
 
     const radius = Math.min(WIDTH, HEIGHT) / 2
 
@@ -19,8 +21,6 @@ const chart1 = () => {
         .outerRadius(radius)
 
     svg
-        .append('g')
-        .attr('transform', `translate(${WIDTH / 2}, ${HEIGHT / 2})`)
         .selectAll('whatever')
         .data(data_ready)
         .join('path')
