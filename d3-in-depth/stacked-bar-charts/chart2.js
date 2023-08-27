@@ -10,7 +10,7 @@ const chart2 = () => {
         xScale = d3
             .scaleBand()
             .domain(groups)
-            .range([20, WIDTH])
+            .range([35, WIDTH])
             .padding([0.2])
         svg.append('g')
             .attr('transform', `translate(0, ${HEIGHT - 20})`)
@@ -21,8 +21,8 @@ const chart2 = () => {
             .domain([0, 1])
             .range([HEIGHT - 20, 0])
         svg.append('g')
-            .attr('transform', `translate(20, 0)`)
-            .call(d3.axisLeft(yScale));
+            .attr('transform', `translate(35, 0)`)
+            .call(d3.axisLeft(yScale).tickFormat(d => `${d * 100}%`));
 
         const colours = d3
             .scaleOrdinal()
