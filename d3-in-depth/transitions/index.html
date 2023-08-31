@@ -9,12 +9,21 @@
     <h2 id="title">Transitions</h2>
 
     <div id="wrapper">
-        <div>
+        <div class="chart-container">
+            <h4>Simple Transitions</h4>
             <svg id="chart1"></svg>
-            <button onclick="updateAll1()">Update data</button>
+            <button style="display: flex;" onclick="updateAll1()">Update chart1</button>
+        </div>
+        <div class="chart-container">
+            <h4>Custom tween</h4>
+            <svg id="chart2">
+                <g></g>
+            </svg>
+            <button style="display: flex;" onclick="updateAll2()">Update chart2</button>
         </div>
     </div>
 
     <script type="text/javascript" src="../script.js"></script>
     <script type="text/javascript" src="chart1.js"></script>
+    <script type="text/javascript" src="chart2.js"></script>
 </body>
