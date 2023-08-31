@@ -23,7 +23,7 @@ const updateChart1 = () => {
         .selectAll('circle')
         .data(data1)
         .join('circle')
-        .attr('cy', 50)
+        .attr('cy', HEIGHT / 2)
         .style('opacity', 0.5)
         .transition()
         .delay((d, i) => 500 * i)
