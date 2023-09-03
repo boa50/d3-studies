@@ -2,14 +2,13 @@
 
 const width = 600
 const margin = ({ top: 16, right: 6, bottom: 6, left: 0 })
-const barSize = 28
-const n = 12
+const barSize = 36
+const n = 10
 const height = margin.top + barSize * n + margin.bottom
 const duration = 250
 const k = 10
 
-const getData = async () =>
-    d3.csv('./data.csv')
+const getData = async () => d3.csv('./data.csv')
 
 const x = d3
     .scaleLinear()
@@ -32,6 +31,9 @@ function textTween(a, b) {
     }
 }
 
+const getRank = (mapping, d) => (mapping.get(d) || d).rank
+const getValue = (mapping, d) => (mapping.get(d) || d).value
+
 
 getData().then(data => {
     // DATA PREPARATION
@@ -47,9 +49,6 @@ getData().then(data => {
 
         return data
     }
-
-    // console.log('dateValues');
-    // console.log(dateValues);
 
     const getKeyframes = () => {
         const keyframes = []
@@ -71,15 +70,10 @@ getData().then(data => {
 
     const keyframes = getKeyframes()
 
-    // console.log('keyframes');
-    // console.log(keyframes);
-
     const nameframes = d3.groups(keyframes.flatMap(([, data]) => data), d => d.company)
     const prev = new Map(nameframes.flatMap(([, data]) => d3.pairs(data, (a, b) => [b, a])))
     const next = new Map(nameframes.flatMap(([, data]) => d3.pairs(data)))
 
-    // console.log('nameframes');
-    // console.log(nameframes);
 
     // PLOTTING
     const colour = d => {
@@ -103,21 +97,21 @@ getData().then(data => {
             .selectAll('rect')
 
         return ([date, data], transition) => bar = bar
-            .data(data.slice(0, n), d => d.name)
+            .data(data.slice(0, n), d => d.company)
             .join(
                 enter => enter
                     .append('rect')
                     .attr('fill', colour)
                     .attr('height', y.bandwidth())
                     .attr('x', x(0))
-                    .attr('y', d => y((prev.get(d) || d).rank))
-                    .attr('width', d => x((next.get(d) || d).value) - x(0)),
+                    .attr('y', d => y(getRank(prev, d)))
+                    .attr('width', d => x(getValue(prev, d)) - x(0)),
                 update => update,
                 exit => exit
                     .transition(transition)
                     .remove()
-                    .attr('y', d => y((next.get(d) || d).rank))
-                    .attr('width', d => x((next.get(d) || d).value) - x(0))
+                    .attr('y', d => y(getRank(next, d)))
+                    .attr('width', d => x(getValue(next, d)) - x(0))
             )
             .call(
                 bar => bar
@@ -130,21 +124,23 @@ getData().then(data => {
     const labels = svg => {
         let label = svg
             .append('g')
-            .style('font', 'bold 12px var(--sans-serif)')
-            .style('font-variant-numeric', 'tabular-nums')
+            // .style('font', `bold ${barSize}px var(--sans-serif)`)
+            .attr('font-weight', 'bold')
+            .attr('font-size', barSize / 2.5)
+            // .style('font-variant-numeric', 'tabular-nums')
             .attr('text-anchor', 'end')
             .selectAll('text')
 
         return ([date, data], transition) => label = label
-            .data(data.slice(0, n), d => d.name)
+            .data(data.slice(0, n), d => d.company)
             .join(
                 enter => enter
                     .append('text')
-                    .attr('transform', d => `translate(${x((prev.get(d) || d).value)}, ${y((prev.get(d) || d).rank)})`)
+                    .attr('transform', d => `translate(${[x(getValue(prev, d)), y(getRank(prev, d))]})`)
                     .attr('y', y.bandwidth() / 2)
                     .attr('x', -6)
                     .attr('dy', '-0.25em')
-                    .text(d => d.name)
+                    .text(d => d.company)
                     .call(
                         text => text
                             .append('tspan')
@@ -157,21 +153,21 @@ getData().then(data => {
                 exit => exit
                     .transition(transition)
                     .remove()
-                    .attr('transform', d => `translate(${x((next.get(d) || d).value)}, ${y((next.get(d) || d).rank)})`)
+                    .attr('transform', d => `translate(${[x(getValue(next, d)), y(getRank(next, d))]})`)
                     .call(
                         g => g
                             .select('tspan')
-                            .tween('text', d => textTween(d.value, (next.get(d) || d).value))
+                            .tween('text', d => textTween(d.value, getValue(next, d)))
                     )
             )
             .call(
                 bar => bar
                     .transition(transition)
-                    .attr('transform', d => `translate(${x(d.value)}, ${y(d.rank)})`)
+                    .attr('transform', d => `translate(${[x(d.value), y(d.rank)]})`)
                     .call(
                         g => g
                             .select('tspan')
-                            .tween('text', d => textTween((prev.get(d) || d).value, d.value))
+                            .tween('text', d => textTween(getValue(prev, d), d.value))
                     )
             )
     }
@@ -198,8 +194,10 @@ getData().then(data => {
     const ticker = svg => {
         const now = svg
             .append('text')
-            .style('font', `bold ${barSize}px var(--sans-serif)`)
-            .style('font-variant-numeric', 'tabular-nums')
+            // .style('font', `bold ${barSize}px var(--sans-serif)`)
+            // .style('font-variant-numeric', 'tabular-nums')
+            .attr('font-weight', 'bold')
+            .attr('font-size', barSize)
             .attr('text-anchor', 'end')
             .attr('x', width - 6)
             .attr('y', margin.top + barSize * (n - 0.45))
@@ -213,32 +211,33 @@ getData().then(data => {
 
 
     const chart = async () => {
-        const svg = d3.select("body")
+        const svg = d3
+            .select("body")
             .append('svg')
             .attr("viewBox", [0, 0, width, height])
             .attr('width', width)
             .attr('height', height)
 
-        const updateBars = bars(svg);
-        const updateLabels = labels(svg);
-        const updateAxis = axis(svg);
-        const updateTicker = ticker(svg);
+        const updateBars = bars(svg)
+        const updateLabels = labels(svg)
+        const updateAxis = axis(svg)
+        const updateTicker = ticker(svg)
 
         for (const keyframe of keyframes) {
-            const transition = svg.transition()
+            const transition = svg
+                .transition()
                 .duration(duration)
-                .ease(d3.easeLinear);
+                .ease(d3.easeLinear)
 
-            // Extract the top bar’s value.
-            x.domain([0, keyframe[1][0].value]);
+            // Extract the top bar’s value
+            x.domain([0, keyframe[1][0].value])
 
-            updateBars(keyframe, transition);
-            updateLabels(keyframe, transition);
-            updateAxis(keyframe, transition);
-            updateTicker(keyframe, transition);
+            updateBars(keyframe, transition)
+            updateLabels(keyframe, transition)
+            updateAxis(keyframe, transition)
+            updateTicker(keyframe, transition)
 
-            await transition.end();
-            svg.interrupt()
+            await transition.end()
         }
     }
 
